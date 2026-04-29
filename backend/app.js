@@ -24,6 +24,15 @@ const allowedOrigins = [
   "http://localhost:5174",
 ].filter(Boolean);
 
+// Simple healthcheck (no DB access)
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use(
   cors({
     origin: allowedOrigins,
