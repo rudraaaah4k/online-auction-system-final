@@ -1,0 +1,4 @@
+{
+  "version": 2,
+  "comment": "Deploy frontend/ folder separately on Vercel. See DEPLOYMENT.md"
+}
