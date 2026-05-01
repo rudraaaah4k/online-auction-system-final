@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// ✅ FIX: remove trailing slash automatically
-const API = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+const API = import.meta.env.VITE_API_URL;
 
-// ================= REGISTER =================
+// ✅ REGISTER
 export const registerUser = createAsyncThunk(
   "user/register",
   async (data, { rejectWithValue }) => {
@@ -16,12 +15,12 @@ export const registerUser = createAsyncThunk(
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Register failed");
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// ================= LOGIN =================
+// ✅ LOGIN
 export const loginUser = createAsyncThunk(
   "user/login",
   async (data, { rejectWithValue }) => {
@@ -33,12 +32,12 @@ export const loginUser = createAsyncThunk(
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Login failed");
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// ================= FETCH USER =================
+// ✅ FETCH USER
 export const fetchUser = createAsyncThunk(
   "user/fetchUser",
   async (_, { rejectWithValue }) => {
@@ -49,12 +48,27 @@ export const fetchUser = createAsyncThunk(
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Fetch failed");
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// ================= LOGOUT =================
+// ✅ FETCH LEADERBOARD  🔥 (THIS WAS MISSING)
+export const fetchLeaderboard = createAsyncThunk(
+  "user/fetchLeaderboard",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `${API}/api/v1/user/leaderboard`
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+// ✅ LOGOUT
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
@@ -65,18 +79,19 @@ export const logoutUser = createAsyncThunk(
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Logout failed");
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// ================= SLICE =================
+// ✅ SLICE
 const userSlice = createSlice({
   name: "user",
   initialState: {
     user: null,
     isAuthenticated: false,
     loading: false,
+    leaderboard: [],
     error: null,
   },
   reducers: {},
@@ -84,17 +99,9 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // REGISTER
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
         state.user = action.payload.user;
         state.isAuthenticated = true;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       })
 
       // LOGIN
@@ -107,6 +114,11 @@ const userSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.isAuthenticated = true;
+      })
+
+      // FETCH LEADERBOARD
+      .addCase(fetchLeaderboard.fulfilled, (state, action) => {
+        state.leaderboard = action.payload.leaderboard;
       })
 
       // LOGOUT
