@@ -25,11 +25,21 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 // Simple healthcheck (no DB access)
+// 1. Health route FIRST
 app.get("/health", (req, res) => {
   res.status(200).json({
-    status: "ok",
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    status: "ok"
+  });
+});
+
+// 2. API routes
+app.use("/api/v1", router);
+
+// 3. 404 handler LAST
+app.all("*", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Not Found - ${req.originalUrl}`
   });
 });
 
