@@ -23,7 +23,104 @@ config({
   path: "./config/config.env",
 });
 
-// Allowed origins
+// Allowed originsimport { config } from "dotenv";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
+
+import { connection } from "./database/connection.js";
+import { errorMiddleware } from "./middlewares/error.js";
+
+import userRouter from "./router/userRoutes.js";
+import auctionItemRouter from "./router/auctionItemRoutes.js";
+import bidRouter from "./router/bidRoutes.js";
+import commissionRouter from "./router/commissionRouter.js";
+import superAdminRouter from "./router/superAdminRoutes.js";
+
+import { endedAuctionCron } from "./automation/endedAuctionCron.js";
+import { verifyCommissionCron } from "./automation/verifyCommissionCron.js";
+
+const app = express();
+
+// Load env
+config({
+  path: "./config/config.env",
+});
+
+// ✅ Allowed origins (IMPORTANT)
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // from Railway env
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(Boolean);
+
+// ✅ Root route
+app.get("/", (req, res) => {
+  res.send("Auction API is running 🚀");
+});
+
+// ✅ Health route
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+// ✅ CORS (ONLY ONCE)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS not allowed"), false);
+      }
+    },
+    credentials: true,
+  })
+);
+
+// ✅ Middlewares
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  fileUpload({
+    useTempFiles: false,
+  })
+);
+
+// ✅ Routes
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/auctionitem", auctionItemRouter);
+app.use("/api/v1/bid", bidRouter);
+app.use("/api/v1/commission", commissionRouter);
+app.use("/api/v1/superadmin", superAdminRouter);
+
+// ✅ Cron jobs
+if (process.env.VERCEL !== "1") {
+  endedAuctionCron();
+  verifyCommissionCron();
+}
+
+// ✅ DB connection
+connection();
+
+// ✅ Error handler
+app.use(errorMiddleware);
+
+// ✅ 404 handler
+app.all("*", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Not Found - ${req.originalUrl}`,
+  });
+});
+
+export default app;
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
