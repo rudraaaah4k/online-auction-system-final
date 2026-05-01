@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL;
+// ✅ FIX: remove trailing slash automatically
+const API = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
 
-// ✅ REGISTER
+// ================= REGISTER =================
 export const registerUser = createAsyncThunk(
   "user/register",
   async (data, { rejectWithValue }) => {
@@ -20,7 +21,7 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// ✅ LOGIN
+// ================= LOGIN =================
 export const loginUser = createAsyncThunk(
   "user/login",
   async (data, { rejectWithValue }) => {
@@ -37,7 +38,7 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// ✅ FETCH USER
+// ================= FETCH USER =================
 export const fetchUser = createAsyncThunk(
   "user/fetchUser",
   async (_, { rejectWithValue }) => {
@@ -53,7 +54,7 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
-// ✅ LOGOUT
+// ================= LOGOUT =================
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
@@ -69,7 +70,7 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-// ✅ SLICE
+// ================= SLICE =================
 const userSlice = createSlice({
   name: "user",
   initialState: {
