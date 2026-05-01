@@ -30,6 +30,10 @@ const allowedOrigins = [
   "http://localhost:5174",
 ].filter(Boolean);
 
+app.get("/", (req, res) => {
+  res.send("Auction API is running 🚀");
+});
+
 
 // ✅ 1. HEALTHCHECK ROUTE (NO DB DEPENDENCY)
 app.get("/health", (req, res) => {
