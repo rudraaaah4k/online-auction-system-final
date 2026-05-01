@@ -9,9 +9,10 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdCloseCircleOutline, IoIosCreate } from "react-icons/io";
 import { FaFileInvoiceDollar, FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "@/store/slices/userSlice"; // ✅ FIXED
+import { logoutUser } from "@/store/slices/userSlice";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+
 
 const NavLink = ({ to, icon, children, onClick }) => {
   const { pathname } = useLocation();
