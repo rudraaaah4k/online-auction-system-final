@@ -36,14 +36,18 @@ app.get("/", (req, res) => {
 
 
 // ✅ 1. HEALTHCHECK ROUTE (NO DB DEPENDENCY)
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    message: "Server is healthy",
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
+app.use(
+  cors({
+    origin: [
+      process.env.FRONTEND_URL,
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://your-frontend.vercel.app"
+    ],
+    methods: ["POST", "GET", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 
 // ✅ 2. MIDDLEWARES
